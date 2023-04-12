@@ -15,6 +15,7 @@ beforeEach(async () => {
     schema: "typeorm-optimistic-lock",
     database: "postgres",
     username: "postgres",
+    password: "postgres",
     synchronize: true,
   });
 
