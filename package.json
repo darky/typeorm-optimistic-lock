@@ -1,0 +1,37 @@
+{
+  "name": "typeorm-optimistic-lock",
+  "version": "0.0.0",
+  "description": "TypeORM helper for optimistic lock persistance",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "test": "tsx test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "typeorm",
+    "optimistic",
+    "lock"
+  ],
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:darky/typeorm-optimistic-lock.git"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts"
+  ],
+  "author": "Vladislav Botvin",
+  "license": "MIT",
+  "peerDependencies": {
+    "typeorm": "^0.2.45 || ^0.3.14"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "pg": "^8.10.0",
+    "reflect-metadata": "^0.1.13",
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.4"
+  }
+}
