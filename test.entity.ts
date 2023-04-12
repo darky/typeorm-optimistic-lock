@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
-export class Test {
+export class TypeORMOptimisticLockTest {
   @PrimaryColumn("integer")
   id!: number;
 

@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import { afterEach, beforeEach, test } from "node:test";
 import { DataSource, createConnection } from "typeorm";
-import { Test } from "./test.entity";
+import { TypeORMOptimisticLockTest } from "./test.entity";
 import { typeormOptimisticLockSave } from "./index";
 import assert from "assert";
 
@@ -12,14 +12,13 @@ beforeEach(async () => {
   connection = await createConnection({
     entities: ["test.entity.ts"],
     type: "postgres",
-    schema: "typeorm-optimistic-lock",
     database: "postgres",
     username: "postgres",
     password: "postgres",
     synchronize: true,
   });
 
-  await connection.getRepository(Test).clear();
+  await connection.getRepository(TypeORMOptimisticLockTest).clear();
 });
 
 afterEach(async () => {
@@ -28,12 +27,14 @@ afterEach(async () => {
 
 test("basic insert works", async () => {
   await typeormOptimisticLockSave({
-    repository: connection.getRepository(Test),
+    repository: connection.getRepository(TypeORMOptimisticLockTest),
     conflictError: new Error("test"),
     forInsert: { id: 1, text: "foo bar", version: 1 },
   });
 
-  const entity = await connection.getRepository(Test).findOneBy({ id: 1 });
+  const entity = await connection
+    .getRepository(TypeORMOptimisticLockTest)
+    .findOneBy({ id: 1 });
 
   assert.ok(entity);
   assert.strictEqual(entity.text, "foo bar");
@@ -41,7 +42,7 @@ test("basic insert works", async () => {
 });
 
 test("fails with conflict on insert", async () => {
-  await connection.getRepository(Test).save({
+  await connection.getRepository(TypeORMOptimisticLockTest).save({
     id: 1,
     text: "foo bar",
     version: 1,
@@ -51,7 +52,7 @@ test("fails with conflict on insert", async () => {
   await assert.rejects(
     () =>
       typeormOptimisticLockSave({
-        repository: connection.getRepository(Test),
+        repository: connection.getRepository(TypeORMOptimisticLockTest),
         conflictError,
         forInsert: { id: 1, text: "foo bar", version: 1 },
       }),
@@ -60,20 +61,22 @@ test("fails with conflict on insert", async () => {
 });
 
 test("basic update works", async () => {
-  await connection.getRepository(Test).save({
+  await connection.getRepository(TypeORMOptimisticLockTest).save({
     id: 1,
     text: "foo bar",
     version: 1,
   });
 
   await typeormOptimisticLockSave({
-    repository: connection.getRepository(Test),
+    repository: connection.getRepository(TypeORMOptimisticLockTest),
     conflictError: new Error("test"),
     forUpdate: { id: 1, text: "test", version: 2 },
     whereUpdate: { id: 1, version: 1 },
   });
 
-  const entity = await connection.getRepository(Test).findOneBy({ id: 1 });
+  const entity = await connection
+    .getRepository(TypeORMOptimisticLockTest)
+    .findOneBy({ id: 1 });
 
   assert.ok(entity);
   assert.strictEqual(entity.text, "test");
@@ -81,7 +84,7 @@ test("basic update works", async () => {
 });
 
 test("fails with conflict on update", async () => {
-  await connection.getRepository(Test).save({
+  await connection.getRepository(TypeORMOptimisticLockTest).save({
     id: 1,
     text: "another update",
     version: 2,
@@ -91,7 +94,7 @@ test("fails with conflict on update", async () => {
   await assert.rejects(
     () =>
       typeormOptimisticLockSave({
-        repository: connection.getRepository(Test),
+        repository: connection.getRepository(TypeORMOptimisticLockTest),
         conflictError,
         forUpdate: { id: 1, text: "test", version: 2 },
         whereUpdate: { id: 1, version: 1 },
@@ -107,7 +110,7 @@ test("any persistance option should be provided", async () => {
   await assert.rejects(
     () =>
       typeormOptimisticLockSave({
-        repository: connection.getRepository(Test),
+        repository: connection.getRepository(TypeORMOptimisticLockTest),
         conflictError: error,
       }),
     error
@@ -121,7 +124,7 @@ test("version: 1 required for inserting", async () => {
   await assert.rejects(
     () =>
       typeormOptimisticLockSave({
-        repository: connection.getRepository(Test),
+        repository: connection.getRepository(TypeORMOptimisticLockTest),
         conflictError: error,
         forInsert: { id: 1, text: "foo bar", version: -1 },
       }),
@@ -136,7 +139,7 @@ test("for updating versions should be differ by 1", async () => {
   await assert.rejects(
     () =>
       typeormOptimisticLockSave({
-        repository: connection.getRepository(Test),
+        repository: connection.getRepository(TypeORMOptimisticLockTest),
         conflictError: error,
         forUpdate: { id: 1, text: "test", version: 3 },
         whereUpdate: { id: 1, version: 1 },
