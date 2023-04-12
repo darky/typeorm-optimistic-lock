@@ -1,6 +1,6 @@
 {
   "name": "typeorm-optimistic-lock",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "TypeORM helper for optimistic lock persistance",
   "main": "dist/index.js",
   "scripts": {
